@@ -57,6 +57,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- Needed to change the executable to java instead of ${java}, Don't know why... -->
                     <executable>java</executable>
                     <workingDirectory>.</workingDirectory>
                     <longModulepath>false</longModulepath>

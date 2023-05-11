@@ -22,6 +22,10 @@ public class EnemyProcess implements IEntityProcessingService {
             MovingPart movingPart = enemy.getPart(MovingPart.class);
             LifePart lifePart = enemy.getPart(LifePart.class);
 
+            if (lifePart.isDead()) {
+                world.removeEntity(enemy);
+            }
+
             double random = Math.random();
             movingPart.setLeft(random < 0.2);
             movingPart.setRight(random > 0.3 && random < 0.5);
