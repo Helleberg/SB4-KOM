@@ -1,13 +1,15 @@
 package dk.sdu.raeri21.cbse.main;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class Main {
 	
 	public static void main(String[] args) {
-		int width = 800;
-		int height = 600;
+		int width = 1400;
+		int height = 800;
 
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setTitle("raeri21 - Asteroids");
@@ -15,7 +17,11 @@ public class Main {
 		config.setWindowSizeLimits(width,height,width,height);
 		config.setResizable(false);
 
-		new Lwjgl3Application(new Game(), config);
+		AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+		applicationContext.scan("dk.sdu.raeri21.cbse.main");
+		applicationContext.refresh();
+
+		new Lwjgl3Application((ApplicationListener) applicationContext.getBean("game"), config);
 		
 	}
 	

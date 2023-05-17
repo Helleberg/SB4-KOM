@@ -8,18 +8,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import dk.sdu.raeri21.cbse.common.data.Entity;
 import dk.sdu.raeri21.cbse.common.data.GameData;
 import dk.sdu.raeri21.cbse.common.data.World;
-import dk.sdu.raeri21.cbse.common.services.IEntityProcessingService;
-import dk.sdu.raeri21.cbse.common.services.IGamePluginService;
-import dk.sdu.raeri21.cbse.common.services.IPostEntityProcessingService;
+import dk.sdu.raeri21.cbse.components.IProcessor;
+import dk.sdu.raeri21.cbse.components.PluginInjection;
 import dk.sdu.raeri21.cbse.managers.GameInputProcessor;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.ServiceLoader;
-
-import static java.util.stream.Collectors.toList;
-
+@Component("game")
 public class Game
         implements ApplicationListener {
+
+    private AnnotationConfigApplicationContext components;
 
     private static OrthographicCamera cam;
     private ShapeRenderer sr;
@@ -27,26 +26,25 @@ public class Game
     private final GameData gameData = new GameData();
     private World world = new World();
 
+    public Game() {
+        this.components = new AnnotationConfigApplicationContext();
+        this.components.scan("dk.sdu.raeri21.cbse.components");
+        this.components.refresh();
+    }
+
     @Override
     public void create() {
-
-        gameData.setDisplayWidth(Gdx.graphics.getWidth());
-        gameData.setDisplayHeight(Gdx.graphics.getHeight());
-
-        cam = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
-        cam.translate(gameData.getDisplayWidth() / 2, gameData.getDisplayHeight() / 2);
-        cam.update();
-
         sr = new ShapeRenderer();
+
+        if (gameData.getDisplayWidth() != Gdx.graphics.getWidth() || gameData.getDisplayHeight() != Gdx.graphics.getHeight()) {
+            this.updateCam(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
 
         Gdx.input.setInputProcessor(
                 new GameInputProcessor(gameData)
         );
 
-        // Lookup all Game Plugins using ServiceLoader
-        for (IGamePluginService iGamePlugin : getPluginServices()) {
-            iGamePlugin.start(gameData, world);
-        }
+        ((PluginInjection) components.getBean("pluginInjector")).startPlugins(gameData, world);
     }
 
     @Override
@@ -65,15 +63,19 @@ public class Game
         gameData.getKeys().update();
     }
 
+    private void updateCam(int width, int height) {
+        gameData.setDisplayWidth(width);
+        gameData.setDisplayHeight(height);
+
+        cam = new OrthographicCamera(gameData.getDisplayWidth(), gameData.getDisplayHeight());
+        cam.translate((float) gameData.getDisplayWidth() / 2, (float) gameData.getDisplayHeight() / 2);
+        cam.update();
+    }
+
     private void update() {
         // Update
-        for (IEntityProcessingService entityProcessorService : getEntityProcessingServices()) {
-            entityProcessorService.process(gameData, world);
-        }
-
-        for (IPostEntityProcessingService postEntityProcessingService : getPostEntityProcessingServices()) {
-            postEntityProcessingService.process(gameData, world);
-        }
+        ((IProcessor) components.getBean("processorInjector")).process(gameData, world);
+        ((IProcessor) components.getBean("postProcessorInjector")).process(gameData, world);
     }
 
     private void draw() {
@@ -99,6 +101,7 @@ public class Game
 
     @Override
     public void resize(int width, int height) {
+        this.updateCam(width, height);
     }
 
     @Override
@@ -111,17 +114,5 @@ public class Game
 
     @Override
     public void dispose() {
-    }
-
-    private Collection<? extends IGamePluginService> getPluginServices() {
-        return ServiceLoader.load(IGamePluginService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
-
-    private Collection<? extends IEntityProcessingService> getEntityProcessingServices() {
-        return ServiceLoader.load(IEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
-    }
-
-    private Collection<? extends IPostEntityProcessingService> getPostEntityProcessingServices() {
-        return ServiceLoader.load(IPostEntityProcessingService.class).stream().map(ServiceLoader.Provider::get).collect(toList());
     }
 }
