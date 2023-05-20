@@ -19,8 +19,8 @@
     <repositories>
         <repository>
             <id>github</id>
-            <name>GitHub Helleberg Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/Helleberg/ShadedLibGDX</url>
+            <name>GitHub sweat-tek Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/sweat-tek/ShadedLibGDX</url>
         </repository>
     </repositories>
     
