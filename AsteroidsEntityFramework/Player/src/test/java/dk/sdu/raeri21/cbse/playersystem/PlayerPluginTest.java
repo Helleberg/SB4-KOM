@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PlayerPluginTest {
 
