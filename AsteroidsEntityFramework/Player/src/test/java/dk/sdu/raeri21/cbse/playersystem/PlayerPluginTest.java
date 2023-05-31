@@ -3,23 +3,19 @@ package dk.sdu.raeri21.cbse.playersystem;
 import dk.sdu.raeri21.cbse.common.data.GameData;
 import dk.sdu.raeri21.cbse.common.data.World;
 import org.junit.jupiter.api.*;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PlayerPluginTest {
-
-    @Mock
     private static GameData mockedGameData;
-    @Mock
     private static World mockedWorld;
     private static PlayerPlugin playerPlugin;
 
     @BeforeAll
-    void setUp() {
-        MockitoAnnotations.initMocks(this);
+    static void setUp() {
+        mockedGameData = mock(GameData.class);
+        mockedWorld = mock(World.class);
 
         playerPlugin = new PlayerPlugin();
     }
