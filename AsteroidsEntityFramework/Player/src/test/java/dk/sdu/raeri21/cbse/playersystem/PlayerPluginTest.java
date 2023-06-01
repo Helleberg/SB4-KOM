@@ -14,9 +14,11 @@ public class PlayerPluginTest {
 
     @BeforeAll
     static void setUp() {
+        // Mock GameData and World
         mockedGameData = mock(GameData.class);
         mockedWorld = mock(World.class);
 
+        // Create Instance of the player plugin class
         playerPlugin = new PlayerPlugin();
     }
 
