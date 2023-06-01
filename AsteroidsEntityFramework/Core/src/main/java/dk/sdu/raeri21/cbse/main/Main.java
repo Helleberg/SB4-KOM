@@ -22,7 +22,5 @@ public class Main {
 		applicationContext.refresh();
 
 		new Lwjgl3Application((ApplicationListener) applicationContext.getBean("game"), config);
-		
 	}
-	
 }
